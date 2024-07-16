@@ -1,0 +1,134 @@
+﻿@model LogKPI.Models.CombineModel
+
+@{
+    Layout = "";
+}
+
+<h2>Create</h2>
+<div class="content-wrapper">
+    <!-- Main content -->
+    <div class="content-header">
+        <div class="row mb-2">
+            <div class="col-sm-6 btn-group">
+                <div class="mr-2">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="background-color: #357873;color: white">
+                        <i class="bi bi-database-fill-add"></i> Add Data
+                    </button>
+
+                    <!-- Button trigger modal excel -->
+                    <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#staticBackdrop1" style="background-color: #357873;color: white">
+                        <i class="bi bi-file-earmark-excel"></i> Import Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Add Data -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Input KPI errors</h1>
+                        <button type="button" class="close" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    @using (Html.BeginForm("PostCreate", "IndikatorKPI", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="modal-body">
+                            <form class="form-group" id="myForm">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>Shipping Date</label>
+                                        @Html.TextBoxFor(m => m.CreateKPI.Ship_date, new { @class = "form-control", @type = "Date", @required = "required" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>Number of Items Bill Landing</label>
+                                        @Html.EditorFor(m => m.CreateKPI.Num_BL, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.Num_BL, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Number of Items Decalred</label>
+                                        @Html.EditorFor(m => m.CreateKPI.Num_Dec, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.Num_Dec, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Description Error</label>
+                                        @Html.EditorFor(m => m.CreateKPI.DE, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.DE, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Hs Code</label>
+                                        @Html.EditorFor(m => m.CreateKPI.HS_CodeErr, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.HS_CodeErr, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>CoO Error</label>
+                                        @Html.EditorFor(m => m.CreateKPI.CO_Err, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.CO_Err, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Quantity Error</label>
+                                        @Html.EditorFor(m => m.CreateKPI.Quantity, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.Quantity, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Value Error</label>
+                                        @Html.EditorFor(m => m.CreateKPI.Val_Err, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.Val_Err, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row mt-2">
+                                    <div class="col-sm-6">
+                                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                        <button type="reset" class="btn btn-secondary">Cancel</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content -->
+</div>
+
+<!-- Masukkan library Sweet Alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#myForm').submit(function (e) {
+            e.preventDefault(); // Hindari pengiriman formulir yang normal
+
+            // Lakukan pengiriman data formulir menggunakan AJAX
+            $.ajax({
+                url: '@Url.Action("PostCreate", "IndikatorKPI")', // Ganti dengan URL yang benar
+                type: 'post',
+                data: $(this).serialize(),
+                success: function () {
+                    // Tampilkan Sweet Alert setelah pengisian data berhasil
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Data has been successfully added.',
+                        icon: 'success'
+                    }).then(function () {
+                        window.location.href = '/IndikatorKPI/IndexData'; // Ganti dengan URL yang sesuai
+                    });
+                },
+                error: function () {
+                    // Tampilkan pesan kesalahan jika terjadi kesalahan saat pengiriman data
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while adding the data.',
+                        icon: 'error'
+                    });
+                }
+            });
+        });
+    });
+</script>

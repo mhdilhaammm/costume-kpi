@@ -1,0 +1,227 @@
+﻿@model LogKPI.Models.CombineModel
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Main content -->
+    <div class="content-header">
+        <div class="row mb-2">
+            <div class="col-sm-6 btn-group">
+                <div class="mr-2">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="background-color: #357873;color: white">
+                        <i class="bi bi-database-fill-add"></i> Add Data
+                    </button>
+
+                    <!-- Button trigger modal excel -->
+                    <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#staticBackdrop1" style="background-color: #357873;color: white">
+                        <i class="bi bi-file-earmark-excel"></i> Import Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="card">
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <!-- FILTERING DATE -->
+                            @using (Html.BeginForm("IndexData", "IndikatorKPI", FormMethod.Get))
+                            {
+                                <div class="form-group row">
+                                    <label for="fromDate" style="padding-top: calc(.375rem + 1px); margin-right:2px;">From:</label>
+                                    @Html.TextBox("fromDate", (string)ViewBag.FromDate, new { @class = "form-control col-sm-2 datepicker", @autocomplete = "off", @type = "date" })
+                                    <label for="toDate" class="ml-sm-3" style="padding-top: calc(.375rem + 1px); margin-right: 2px;">To:</label>
+                                    @Html.TextBox("toDate", (string)ViewBag.ToDate, new { @class = "form-control col-sm-2 datepicker", @autocomplete = "off", @type = "date" })
+                                    <button type="submit" class="btn btn-default ml-1" style="color: #3e8979"><i class="bi bi-funnel-fill"></i>Filter</button>
+                                </div>
+                            }
+                            <!-- Table data Error KPI -->
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #357873; color: white;">Shipping Date</th>
+                                        <th style="background-color: #357873; color: white;">Number Bill Landing</th>
+                                        <th style="background-color: #357873; color: white;">Number Declared</th>
+                                        <th style="background-color: #357873; color: white;">Description Error</th>
+                                        <th style="background-color: #357873; color: white;">HS Code</th>
+                                        <th style="background-color: #357873; color: white;">CoO Error</th>
+                                        <th style="background-color: #357873; color: white;">Quantity</th>
+                                        <th style="background-color: #357873; color: white;">Value Error</th>
+                                        <th style="background-color: #357873; color: white;">Complete Item</th>
+                                        <th style="background-color: #357873; color: white;">Target Item</th>
+                                        <th style="background-color: #357873; color: white;">Overall Percentage</th>
+                                        <th style="background-color: #357873; color: white;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.ListKPI.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>@Model.ListKPI[i].Ship_date.ToString("dd MMM yyyy")</td>
+                                            <td>@Model.ListKPI[i].Num_BL</td>
+                                            <td>@Model.ListKPI[i].Num_Dec</td>
+                                            <td>@Model.ListKPI[i].DE</td>
+                                            <td>@Model.ListKPI[i].HS_CodeErr</td>
+                                            <td>@Model.ListKPI[i].CO_Err</td>
+                                            <td>@Model.ListKPI[i].Quantity</td>
+                                            <td>@Model.ListKPI[i].Val_Err</td>
+                                            <td>@Model.ListKPI[i].CF</td>
+                                            <td>@Model.ListKPI[i].TF</td>
+                                            <td>@Convert.ToInt32(Model.ListKPI[i].OP)%</td>
+                                            <td>
+                                                <button class="btn btn-danger delete-button" onclick="deleteData(@Model.ListKPI[i].Id)">
+                                                    <i class="bi bi-trash"></i>Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style="background-color: #357873; color: white;">Shipping Date</th>
+                                        <th style="background-color: #357873; color: white;">Number Bill Landing</th>
+                                        <th style="background-color: #357873; color: white;">Number Declared</th>
+                                        <th style="background-color: #357873; color: white;">Description Error</th>
+                                        <th style="background-color: #357873; color: white;">HS Code</th>
+                                        <th style="background-color: #357873; color: white;">CoO Error</th>
+                                        <th style="background-color: #357873; color: white;">Quantity</th>
+                                        <th style="background-color: #357873; color: white;">Value Error</th>
+                                        <th style="background-color: #357873; color: white;">Complete Item</th>
+                                        <th style="background-color: #357873; color: white;">Target Item</th>
+                                        <th style="background-color: #357873; color: white;">Overall Percentage</th>
+                                        <th style="background-color: #357873; color: white;">Action</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- Modal Add Data -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Input KPI errors</h1>
+                        <button type="button" class="close" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    @using (Html.BeginForm("PostCreate", "IndikatorKPI", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="modal-body">
+                            <form class="form-group" id="myForm">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>Shipping Date</label>
+                                        @Html.TextBoxFor(m => m.CreateKPI.Ship_date, new { @class = "form-control", @type = "Date", @required = "required" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>Number of Items Bill Landing</label>
+                                        @Html.EditorFor(m => m.CreateKPI.Num_BL, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.Num_BL, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Number of Items Decalred</label>
+                                        @Html.EditorFor(m => m.CreateKPI.Num_Dec, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.Num_Dec, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Description Error</label>
+                                        @Html.EditorFor(m => m.CreateKPI.DE, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.DE, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Hs Code</label>
+                                        @Html.EditorFor(m => m.CreateKPI.HS_CodeErr, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.HS_CodeErr, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>CoO Error</label>
+                                        @Html.EditorFor(m => m.CreateKPI.CO_Err, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.CO_Err, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Quantity Error</label>
+                                        @Html.EditorFor(m => m.CreateKPI.Quantity, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.Quantity, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label>Value Error</label>
+                                        @Html.EditorFor(m => m.CreateKPI.Val_Err, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                        @Html.ValidationMessageFor(m => m.CreateKPI.Val_Err, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row mt-2">
+                                    <div class="col-sm-6">
+                                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                        <button type="reset" class="btn btn-secondary">Cancel</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!--Modal Excel-->
+        <div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Import File Excel</h1>
+                        <button type="button" class="close" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <form id="excelUploadForm" method="post" action="@Url.Action("Upload", "IndikatorKPI")" enctype="multipart/form-data">
+                        <div class="form-group-sm m-2 row">
+                            <input type="file" name="file" class="form-control col-sm-6" accept=".xlsx, .xls">
+                            <button type="reset" class="btn btn-secondary ml-2" style="float: right;">Cancel</button>
+                            <button type="submit" class="btn btn-primary ml-2" formaction="Upload" style="float: right;">Upload</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content -->
+</div>
+
+<!-- Notification Success add data -->
+@if (TempData["alertMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            title: 'Success',
+            icon: 'success',
+            text: '@TempData["alertMessage"]',
+            showConfirmButton: false,
+            timer: 1000
+        });
+    </script>
+}
+<!-- /.content-wrapper -->
+<style>
+    table .table th {
+        background-color: #357873;
+        color: white;
+    }
+
+    #tag {
+        background-color: #357873;
+    }
+
+        #tag p, #tag i {
+            color: white;
+        }
+</style>

@@ -1,0 +1,432 @@
+﻿<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <div class="content-header">
+        @using (Html.BeginForm("Dashboard", "IndikatorKPI", FormMethod.Get))
+        {
+            <div class="form-group row ml-2">
+                <label for="fromDate" style="padding-top: calc(.375rem + 1px); margin-right:2px;">From:</label>
+                @Html.TextBox("fromDate", (string)ViewBag.FromDate, new { @class = "form-control col-sm-2 datepicker", @autocomplete = "off", @type = "date" })
+                <label for="toDate" class="ml-sm-3" style="padding-top: calc(.375rem + 1px); margin-right: 2px;">To:</label>
+                @Html.TextBox("toDate", (string)ViewBag.ToDate, new { @class = "form-control col-sm-2 datepicker", @autocomplete = "off", @type = "date" })
+                <button type="submit" class="btn btn-default ml-1" style="color: #3e8979"><i class="bi bi-funnel-fill"></i>Filter</button>
+            </div>
+        }
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Import Declaration KPI</h1>
+                </div>
+                <!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/IndikatorKPI/IndexData">Home</a></li>
+                        <li class="breadcrumb-item active">Dashboard</li>
+                    </ol>
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="d-flex justify-content-between">
+                    <h3 class="card-title">
+                        Customs Import Declaration KPI
+                        Overall Declaration Performance
+                    </h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="position-relative mb-4">
+                    <canvas id="chartOp"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <!-- Chart Description Error -->
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="d-flex justify-content-between">
+                            <h3 class="card-title">
+                                Customs Import Declaration KPI
+                                Description Error
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="position-relative mb-4">
+                            <canvas id="chartDE" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Quantity Error -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="d-flex justify-content-between">
+                            <h3 class="card-title">
+                                Customs Import Declaration KPI
+                                Quantity Error
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="position-relative mb-4">
+                            <canvas id="chartQty" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart HS Code Error -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="d-flex justify-content-between">
+                            <h3 class="card-title">
+                                Customs Import Declaration KPI
+                                HS Code Error
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="position-relative mb-4">
+                            <canvas id="chartHscode" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart CoO Error -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="d-flex justify-content-between">
+                            <h3 class="card-title">
+                                Customs Import Declaration KPI CoO Error
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="position-relative mb-4">
+                            <canvas id="chartCo" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Value Error -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="d-flex justify-content-between">
+                            <h3 class="card-title">
+                                Customs Import Declaration KPI Value Error
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="position-relative mb-4">
+                            <canvas id="chartVal" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Number of Items in Bill Lading -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="d-flex justify-content-between">
+                            <h3 class="card-title">
+                                Customs Import Declaration KPI
+                                Number of Items in Bill Lading
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="position-relative mb-4">
+                            <canvas id="chartBil" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    //Mendefinisikan data yang akan diambil dari controller untuk dimasukkan kedalam chart report
+    var chartLabes = @Html.Raw(Json.Encode(ViewBag.ChartLabels));
+    var chartDe = @Html.Raw(Json.Encode(ViewBag.ChartDe));
+    var chartQty = @Html.Raw(Json.Encode(ViewBag.ChartQty));
+    var chartHscode = @Html.Raw(Json.Encode(ViewBag.ChartHscode));
+    var chartOp = @Html.Raw(Json.Encode(ViewBag.ChartSumOP));
+    var chartCo = @Html.Raw(Json.Encode(ViewBag.ChartCoErr));
+    var chartVal = @Html.Raw(Json.Encode(ViewBag.ChartVal));
+    var chartNumBil = @Html.Raw(Json.Encode(ViewBag.ChartNumBilLand));
+
+    const ctxDE = document.getElementById('chartDE');
+    const ctxQty = document.getElementById('chartQty');
+    const ctxHscode = document.getElementById('chartHscode');
+    const ctxSumOp = document.getElementById('chartOp');
+    const ctxCo = document.getElementById('chartCo');
+    const ctxVal = document.getElementById('chartVal');
+    const ctxBil = document.getElementById('chartBil');
+
+
+    //chart untuk Overall Percentage
+    new Chart(ctxSumOp, {
+        type: 'bar',
+        data: {
+            labels: chartLabes,
+            datasets: [{
+                label: 'Overall Declaration Performance',
+                data: chartOp,
+                backgroundColor: 'rgba(22, 121, 171, 0.2)',
+                borderColor: '#1679AB',
+                tension: 0.1,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 95,
+                    max: 100
+                }
+            }
+        },
+    });
+
+    //chart untuk Description Error
+    new Chart(ctxDE, {
+        type: 'line',
+        data: {
+            labels: chartLabes,
+            datasets: [{
+                label: 'Description Error',
+                data: chartDe,
+                borderColor: '#1679AB',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 10,
+                    grid: {
+                        drawOnChartArea: true,
+                        color: function (context) {
+                            const value = context.tick.value
+                            if (value >= 5) {
+                                return '#EE4E4E'
+                            } else if (value >= 3) {
+                                return '#FFC700'
+                            } else if (value >= 0) {
+                                return '#06D001'
+                            }
+                        },
+                        borderWidth: 1
+                    }
+                },
+            }
+        }
+    });
+
+    //chart untuk Quantity error
+    new Chart(ctxQty, {
+        type: 'line',
+        data: {
+            labels: chartLabes,
+            datasets: [{
+                label: 'Quantity Error',
+                data: chartQty,
+                borderColor: '#1679AB',
+                tension: 0.1,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 10,
+                    grid: {
+                        drawOnChartArea: true,
+                        color: function (context) {
+                            const value = context.tick.value
+                            if (value >= 5) {
+                                return '#EE4E4E'
+                            } else if (value >= 3) {
+                                return '#FFC700'
+                            } else if (value >= 0) {
+                                return '#06D001'
+                            }
+                        },
+                        borderWidth: 1
+                    }
+                }
+            }
+        }
+    });
+
+    //chart untuk HS Code error
+    new Chart(ctxHscode, {
+        type: 'line',
+        data: {
+            labels: chartLabes,
+            datasets: [{
+                label: 'HS Code Error',
+                data: chartHscode,
+                borderColor: '#1679AB',
+                tension: 0.1,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 10,
+                    grid: {
+                        drawOnChartArea: true,
+                        color: function (context) {
+                            const value = context.tick.value
+                            if (value >= 5) {
+                                return '#EE4E4E'
+                            } else if (value >= 3) {
+                                return '#FFC700'
+                            } else if (value >= 0) {
+                                return '#06D001'
+                            }
+                        },
+                        borderWidth: 1
+                    }
+                }
+            }
+        }
+    });
+
+    //chart untuk CoO error
+    new Chart(ctxCo, {
+        type: 'line',
+        data: {
+            labels: chartLabes,
+            datasets: [{
+                label: 'CoO Error',
+                data: chartCo,
+                borderColor: '#1679AB',
+                tension: 0.1,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 10,
+                    grid: {
+                        drawOnChartArea: true,
+                        color: function (context) {
+                            const value = context.tick.value
+                            if (value >= 5) {
+                                return '#EE4E4E'
+                            } else if (value >= 3) {
+                                return '#FFC700'
+                            } else if (value >= 0) {
+                                return '#06D001'
+                            } else {
+                                return '#dedede'
+                            }
+                        },
+                        borderWidth: 1
+                    }
+                }
+            }
+        }
+    });
+
+    //chart untuk Value error
+    new Chart(ctxVal, {
+        type: 'line',
+        data: {
+            labels: chartLabes,
+            datasets: [{
+                label: 'Value Error',
+                fill: false,
+                data: chartVal,
+                borderColor: '#1679AB',
+                tension: 0.1,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 10,
+                    grid: {
+                        drawOnChartArea: true,
+                        color: function (context) {
+                            const value = context.tick.value
+                            if (value >= 5) {
+                                return '#EE4E4E'
+                            } else if (value >= 3) {
+                                return '#FFC700'
+                            } else if (value >= 0) {
+                                return '#06D001'
+                            }
+                        },
+                        borderWidth: 1
+                    }
+                }
+            }
+        }
+    });
+
+    //chart untuk Number of items Bill Lading
+    new Chart(ctxBil, {
+        type: 'bar',
+        data: {
+            labels: chartLabes,
+            datasets: [{
+                label: 'Bill Lading',
+                data: chartNumBil,
+                backgroundColor: 'rgba(22, 121, 171, 0.2)',
+                borderColor: '#1679AB',
+                tension: 0.1,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                }
+            }
+        }
+    });
+</script>

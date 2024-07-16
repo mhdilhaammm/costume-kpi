@@ -1,0 +1,146 @@
+﻿@model LogKPI.Models.CombineModel
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Main content -->
+    <div class="content-header">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h2 class="text-center">Report Chart</h2>
+                        <div class="card">
+                            <div class="card-header border-0">
+                                <div class="d-flex justify-content-between">
+                                    <h3 class="card-title">
+                                        Customs Import Declaration KPI
+                                        HS Code Error
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="position-relative mb-4">
+                                    <canvas id="chartHscode" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <h2 class="text-center">Report Data</h2>
+                        <div class="card">
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="card-header mb-3">
+                                    <h3 class="card-title">HS Code Errors</h3>
+                                </div>
+                                <!-- FILTERING DATE -->
+                                @using (Html.BeginForm("HSCode_IndexData", "IndikatorKPI", FormMethod.Get))
+                                {
+                                    <div class="form-group row">
+                                        <label for="fromDate" style="padding-top: calc(.375rem + 1px); margin-right:2px;">From:</label>
+                                        @Html.TextBox("fromDate", (string)ViewBag.FromDate, new { @class = "form-control col-sm-2 datepicker", @autocomplete = "off", @type = "date" })
+                                        <label for="toDate" class="ml-sm-3" style="padding-top: calc(.375rem + 1px); margin-right: 2px;">To:</label>
+                                        @Html.TextBox("toDate", (string)ViewBag.ToDate, new { @class = "form-control col-sm-2 datepicker", @autocomplete = "off", @type = "date" })
+                                        <button type="submit" class="btn btn-default ml-1" style="color: #3e8979"><i class="bi bi-funnel-fill"></i>Filter</button>
+                                    </div>
+                                }
+                                <!-- Table data Error KPI -->
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th style="background-color: #357873; color: white;">Shipping Date</th>
+                                            <th style="background-color: #357873; color: white;">HS Code Errors</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.ListKPI.Count; i++)
+                                        {
+                                            <tr>
+                                                <td>@Model.ListKPI[i].Ship_date.ToString("dd MMM yyyy")</td>
+                                                <td>@Model.ListKPI[i].HS_CodeErr</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th style="background-color: #357873; color: white;">Shipping Date</th>
+                                            <th style="background-color: #357873; color: white;">HS Code Errors</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </div>
+                    <!-- /.card -->
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+    </div>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    //Mendefinisikan data yang akan diambil dari controller untuk dimasukkan kedalam chart report
+    var chartLabes = @Html.Raw(Json.Encode(ViewBag.ChartLabels));
+    var chartHscode = @Html.Raw(Json.Encode(ViewBag.ChartHscode));
+
+    const ctxHscode = document.getElementById('chartHscode');
+
+    //chart untuk HS Code error
+    new Chart(ctxHscode, {
+        type: 'line',
+        data: {
+            labels: chartLabes,
+            datasets: [{
+                label: 'HS Code Error',
+                data: chartHscode,
+                borderColor: '#1679AB',
+                tension: 0.1,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 10,
+                    grid: {
+                        drawOnChartArea: true,
+                        color: function (context) {
+                            const value = context.tick.value
+                            if (value >= 5) {
+                                return '#EE4E4E'
+                            } else if (value >= 3) {
+                                return '#FFC700'
+                            } else if (value >= 0) {
+                                return '#06D001'
+                            }
+                        },
+                        borderWidth: 1
+                    }
+                }
+            }
+        }
+    });
+</script>
+<style>
+    table .table th {
+        background-color: #357873;
+        color: white;
+    }
+
+    #tag {
+        background-color: #357873;
+    }
+
+        #tag p, #tag i {
+            color: white;
+        }
+</style>
